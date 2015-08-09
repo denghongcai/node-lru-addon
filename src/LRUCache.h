@@ -18,7 +18,7 @@
 
 using namespace v8;
 
-class LRUCache : public node::ObjectWrap {
+class LRUCache : public Nan::ObjectWrap {
 
 public:
   static void init(Handle<Object> exports);
@@ -31,13 +31,13 @@ private:
 
   struct HashEntry
   {
-    Persistent<Value> value;
+    Nan::Persistent<Value> value;
     KeyList::iterator pointer;
     unsigned long timestamp;
 
     HashEntry(Local<Value> value, KeyList::iterator pointer, unsigned long timestamp)
     {
-      NanAssignPersistent(this->value, value);
+      this->value.Reset(value);
       this->pointer = pointer;
       this->timestamp = timestamp;
     }
