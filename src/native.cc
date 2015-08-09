@@ -1,5 +1,5 @@
 #include <node.h>
-#include <v8.h>
+#include <nan.h>
 #include "LRUCache.h"
 
 using namespace v8;
