@@ -17,7 +17,7 @@ item when necessary.
 
 Based on the [node-hashtable](https://github.com/isaacbwagner/node-hashtable) library by Issac Wagner.
 
-Because original code is out-of-maintained. I update this code and publish it as a new name `lru-addon`
+Because original code is no longer maintained, I update this code and publish it as a new name `lru-addon`
 
 # Usage
 

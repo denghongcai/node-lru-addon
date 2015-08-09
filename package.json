@@ -5,7 +5,7 @@
   "devDependencies": {
     "chai": "latest",
     "mocha": "latest",
-    "coffee-script"
+    "coffee-script": "latest"
   },
   "scripts": {
     "valgrind": "valgrind --leak-check=full --show-possibly-lost=no node --expose-gc --trace-gc node_modules/mocha/bin/_mocha -R spec --compilers coffee:coffee-script/register",
