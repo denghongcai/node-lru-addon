@@ -140,8 +140,10 @@ NAN_METHOD(LRUCache::Get)
   const HashMap::const_iterator itr = cache->data.find(key);
 
   // If the specified entry doesn't exist, return undefined.
-  if (itr == cache->data.end())
-    info.GetReturnValue().Set(Nan::Undefined());
+  if (itr == cache->data.end()) {
+    info.GetReturnValue().SetUndefined();
+    return;
+  }
 
   HashEntry* entry = itr->second;
 
@@ -151,7 +153,8 @@ NAN_METHOD(LRUCache::Get)
     cache->remove(itr);
 
     // Return undefined.
-    info.GetReturnValue().Set(Nan::Undefined());
+    info.GetReturnValue().SetUndefined();
+    return;
   }
   else
   {
@@ -205,7 +208,7 @@ NAN_METHOD(LRUCache::Set)
   }
 
   // Return undefined.
-  info.GetReturnValue().Set(Nan::Undefined());
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Remove)
@@ -222,7 +225,7 @@ NAN_METHOD(LRUCache::Remove)
     cache->remove(itr);
   
   // Return undefined.
-  info.GetReturnValue().Set(Nan::Undefined());
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Clear)
@@ -234,7 +237,7 @@ NAN_METHOD(LRUCache::Clear)
   cache->lru.clear();
 
   // Return undefined.
-  info.GetReturnValue().Set(Nan::Undefined());
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Size)
