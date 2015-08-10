@@ -1,6 +1,6 @@
 {
-  "name": "lru-addons",
-  "version": "1.0.0",
+  "name": "lru-addon",
+  "version": "1.0.1",
   "description": "a native LRU cache implementation",
   "repository": {
     "type": "git",
