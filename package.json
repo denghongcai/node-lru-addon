@@ -2,6 +2,7 @@
   "name": "lru-addon",
   "version": "1.0.3",
   "description": "a native LRU cache implementation",
+  "gypfile": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/denghongcai/node-lru-addon.git"
