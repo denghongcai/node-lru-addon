@@ -16,6 +16,6 @@
     "test": "mocha"
   },
   "dependencies": {
-    "nan": "latest"
+    "nan": "1.8.4"
   }
 }
