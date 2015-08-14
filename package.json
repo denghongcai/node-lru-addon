@@ -1,15 +1,21 @@
 {
-  "name": "lru-native",
-  "version": "0.4.0",
+  "name": "lru-addon",
+  "version": "1.0.1",
   "description": "a native LRU cache implementation",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denghongcai/node-lru-addon.git"
+  },
   "devDependencies": {
     "chai": "latest",
-    "mocha": "latest"
+    "mocha": "latest",
+    "coffee-script": "latest"
   },
   "scripts": {
-    "valgrind": "valgrind --leak-check=full --show-possibly-lost=no node --expose-gc --trace-gc node_modules/mocha/bin/_mocha -R spec --compilers coffee:coffee-script/register"
+    "valgrind": "valgrind --leak-check=full --show-possibly-lost=no node --expose-gc --trace-gc node_modules/mocha/bin/_mocha -R spec --compilers coffee:coffee-script/register",
+    "test": "mocha"
   },
   "dependencies": {
-    "nan": "latest"
+    "nan": "*"
   }
 }

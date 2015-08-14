@@ -1,6 +1,7 @@
 #include "LRUCache.h"
 #include <sys/time.h>
 #include <math.h>
+#include <iostream>
 
 #ifndef __APPLE__
 #include <unordered_map>
@@ -23,54 +24,53 @@ std::string getStringValue(Handle<Value> value)
 
 void LRUCache::init(Handle<Object> exports)
 {
-  Local<String> className = NanNew("LRUCache");
+  Local<String> className = Nan::New("LRUCache").ToLocalChecked();
 
-  Local<FunctionTemplate> constructor = NanNew<FunctionTemplate>(New);
+  Local<FunctionTemplate> constructor = Nan::New<FunctionTemplate>(New);
   constructor->SetClassName(className);
 
   Handle<ObjectTemplate> instance = constructor->InstanceTemplate();
   instance->SetInternalFieldCount(6);
 
   Handle<ObjectTemplate> prototype = constructor->PrototypeTemplate();
-  prototype->Set(NanNew("get"), NanNew<FunctionTemplate>(Get)->GetFunction());
-  prototype->Set(NanNew("set"), NanNew<FunctionTemplate>(Set)->GetFunction());
-  prototype->Set(NanNew("remove"), NanNew<FunctionTemplate>(Remove)->GetFunction());
-  prototype->Set(NanNew("clear"), NanNew<FunctionTemplate>(Clear)->GetFunction());
-  prototype->Set(NanNew("size"), NanNew<FunctionTemplate>(Size)->GetFunction());
-  prototype->Set(NanNew("stats"), NanNew<FunctionTemplate>(Stats)->GetFunction());
+  prototype->Set(Nan::New("get").ToLocalChecked(), Nan::New<FunctionTemplate>(Get)->GetFunction());
+  prototype->Set(Nan::New("set").ToLocalChecked(), Nan::New<FunctionTemplate>(Set)->GetFunction());
+  prototype->Set(Nan::New("remove").ToLocalChecked(), Nan::New<FunctionTemplate>(Remove)->GetFunction());
+  prototype->Set(Nan::New("clear").ToLocalChecked(), Nan::New<FunctionTemplate>(Clear)->GetFunction());
+  prototype->Set(Nan::New("size").ToLocalChecked(), Nan::New<FunctionTemplate>(Size)->GetFunction());
+  prototype->Set(Nan::New("stats").ToLocalChecked(), Nan::New<FunctionTemplate>(Stats)->GetFunction());
   
   exports->Set(className, constructor->GetFunction());
 }
 
 NAN_METHOD(LRUCache::New)
 {
-  NanScope();
   LRUCache* cache = new LRUCache();
 
-  if (args.Length() > 0 && args[0]->IsObject())
+  if (info.Length() > 0 && info[0]->IsObject())
   {
-    Local<Object> config = args[0]->ToObject();
+    Local<Object> config = info[0]->ToObject();
 
-    Local<Value> maxElements = config->Get(NanNew("maxElements"));
+    Local<Value> maxElements = config->Get(Nan::New("maxElements").ToLocalChecked());
     if (maxElements->IsUint32())
       cache->maxElements = maxElements->Uint32Value();
 
-    Local<Value> maxAge = config->Get(NanNew("maxAge"));
+    Local<Value> maxAge = config->Get(Nan::New("maxAge").ToLocalChecked());
     if (maxAge->IsUint32())
       cache->maxAge = maxAge->Uint32Value();
 
-    Local<Value> maxLoadFactor = config->Get(NanNew("maxLoadFactor"));
+    Local<Value> maxLoadFactor = config->Get(Nan::New("maxLoadFactor").ToLocalChecked());
     if (maxLoadFactor->IsNumber())
       cache->data.max_load_factor(maxLoadFactor->NumberValue());
 
-    Local<Value> size = config->Get(NanNew("size"));
+    Local<Value> size = config->Get(Nan::New("size").ToLocalChecked());
     if (size->IsUint32())
       cache->data.rehash(ceil(size->Uint32Value() / cache->data.max_load_factor()));
   }
 
-  cache->Wrap(args.This());
+  cache->Wrap(info.Holder());
 
-  NanReturnValue(NanNew(args.This()));
+  info.GetReturnValue().Set(Nan::New(info.Holder()));
 }
 
 LRUCache::LRUCache()
@@ -89,7 +89,7 @@ void LRUCache::disposeAll()
   for (HashMap::iterator itr = this->data.begin(); itr != this->data.end(); itr++)
   {
     HashEntry* entry = itr->second;
-    NanDisposePersistent(entry->value);
+    entry->value.Reset();
     delete entry;
   }
 }
@@ -104,7 +104,7 @@ void LRUCache::evict()
   HashEntry* entry = itr->second;
 
   // Dispose the V8 handle contained in the entry.
-  NanDisposePersistent(entry->value);
+  entry->value.Reset();
 
   // Remove the entry from the hash and from the LRU list.
   this->data.erase(itr);
@@ -119,7 +119,7 @@ void LRUCache::remove(const HashMap::const_iterator itr)
   HashEntry* entry = itr->second;
 
   // Dispose the V8 handle contained in the entry.
-  NanDisposePersistent(entry->value);
+  entry->value.Reset();
 
   // Remove the entry from the hash and from the LRU list.
   this->data.erase(itr);
@@ -131,18 +131,19 @@ void LRUCache::remove(const HashMap::const_iterator itr)
 
 NAN_METHOD(LRUCache::Get)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
-  if (args.Length() != 1)
-    return NanThrowRangeError("Incorrect number of arguments for get(), expected 1");
+  if (info.Length() != 1)
+    return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for get(), expected 1"));
 
-  std::string key = getStringValue(args[0]);
+  std::string key = getStringValue(info[0]);
   const HashMap::const_iterator itr = cache->data.find(key);
 
   // If the specified entry doesn't exist, return undefined.
-  if (itr == cache->data.end())
-    NanReturnUndefined();
+  if (itr == cache->data.end()) {
+    info.GetReturnValue().SetUndefined();
+    return;
+  }
 
   HashEntry* entry = itr->second;
 
@@ -152,7 +153,8 @@ NAN_METHOD(LRUCache::Get)
     cache->remove(itr);
 
     // Return undefined.
-    NanReturnUndefined();
+    info.GetReturnValue().SetUndefined();
+    return;
   }
   else
   {
@@ -160,22 +162,21 @@ NAN_METHOD(LRUCache::Get)
     cache->lru.splice(cache->lru.end(), cache->lru, entry->pointer);
 
     // Return the value.
-    NanReturnValue(NanNew(entry->value));
-    //args.GetReturnValue().Set(scope.Escape(Local<Value>::New(isolate, entry->value)));
+    info.GetReturnValue().Set(Nan::New(entry->value));
+    //info.GetReturnValue().Set(scope.Escape(Local<Value>::New(isolate, entry->value)));
   }
 }
 
 NAN_METHOD(LRUCache::Set)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
   unsigned long now = cache->maxAge == 0 ? 0 : getCurrentTime();
 
-  if (args.Length() != 2)
-    return NanThrowRangeError("Incorrect number of arguments for set(), expected 2");
+  if (info.Length() != 2)
+    return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for set(), expected 2"));
 
-  std::string key = getStringValue(args[0]);
-  Local<Value> value = args[1];
+  std::string key = getStringValue(info[0]);
+  Local<Value> value = info[1];
   const HashMap::iterator itr = cache->data.find(key);
 
   if (itr == cache->data.end())
@@ -196,10 +197,10 @@ NAN_METHOD(LRUCache::Set)
     HashEntry* entry = itr->second;
 
     // We're replacing an existing value, so dispose the old V8 handle to ensure it gets GC'd.
-    NanDisposePersistent(entry->value);
+    entry->value.Reset();
 
     // Replace the value in the key-value map with the new one, and update the timestamp.
-    NanAssignPersistent(entry->value, value);
+    entry->value.Reset(value);
     entry->timestamp = now;
 
     // Move the value to the end of the LRU list.
@@ -207,57 +208,53 @@ NAN_METHOD(LRUCache::Set)
   }
 
   // Return undefined.
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Remove)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
-  if (args.Length() != 1)
-    NanThrowRangeError("Incorrect number of arguments for remove(), expected 1");
+  if (info.Length() != 1)
+    return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for remove(), expected 1"));
 
-  std::string key = getStringValue(args[0]);
+  std::string key = getStringValue(info[0]);
   const HashMap::iterator itr = cache->data.find(key);
 
   if (itr != cache->data.end())
     cache->remove(itr);
   
   // Return undefined.
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Clear)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
   cache->disposeAll();
   cache->data.clear();
   cache->lru.clear();
 
   // Return undefined.
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(LRUCache::Size)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
-  NanReturnValue(NanNew<Integer>(static_cast<uint32_t>(cache->data.size())));
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  info.GetReturnValue().Set(Nan::New<Integer>(static_cast<uint32_t>(cache->data.size())));
 }
 
 NAN_METHOD(LRUCache::Stats)
 {
-  NanScope();
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(args.This());
+  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
-  Local<Object> stats = NanNew<Object>();
-  stats->Set(NanNew("size"), NanNew<Integer>(static_cast<uint32_t>(cache->data.size())));
-  stats->Set(NanNew("buckets"), NanNew<Integer>(static_cast<uint32_t>(cache->data.bucket_count())));
-  stats->Set(NanNew("loadFactor"), NanNew<Integer>(static_cast<uint32_t>(cache->data.load_factor())));
-  stats->Set(NanNew("maxLoadFactor"), NanNew<Integer>(static_cast<uint32_t>(cache->data.max_load_factor())));
+  Local<Object> stats = Nan::New<Object>();
+  Nan::Set(stats, Nan::New("size").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.size())));
+  Nan::Set(stats, Nan::New("buckets").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.bucket_count())));
+  Nan::Set(stats, Nan::New("loadFactor").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.load_factor())));
+  Nan::Set(stats, Nan::New("maxLoadFactor").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.max_load_factor())));
 
-  NanReturnValue(NanNew(stats));
+  info.GetReturnValue().Set(Nan::New(stats));
 }

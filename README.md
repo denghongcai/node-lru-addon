@@ -1,4 +1,4 @@
-node-lru-native
+node-lru-addon
 ===============
 [![Build Status](https://travis-ci.org/denghongcai/node-lru-native.svg?branch=master)](https://travis-ci.org/denghongcai/node-lru-native)
 
@@ -17,18 +17,20 @@ item when necessary.
 
 Based on the [node-hashtable](https://github.com/isaacbwagner/node-hashtable) library by Issac Wagner.
 
+Because original code is no longer maintained, I update this code and publish it as a new name `lru-addon`
+
 # Usage
 
 Install via npm:
 
 ```
-$ npm install lru-native
+$ npm install lru-addon
 ```
 
 Then:
 
 ```javascript
-var LRUCache = require('lru-native');
+var LRUCache = require('lru-addon');
 var cache = new LRUCache({ maxElements: 1000 });
 cache.set('some-key', 42);
 var value = cache.get('some-key');
@@ -97,6 +99,7 @@ Returns a hash containing internal information about the cache.
 
 # Changelog
 
+- 1.0.0 -- Publish a new package
 - 0.4.0 -- Use nan to across node version
 - 0.3.0 -- Changed memory allocation strategy, fixed issue where remove() would do a seek through the LRU list, code cleanup
 - 0.2.0 -- Fixed issue where maxAge-based removal would result in a seek through the LRU list
