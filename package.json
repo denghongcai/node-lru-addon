@@ -4,7 +4,7 @@
   "description": "a native LRU cache implementation",
   "repository": {
     "type": "git",
-    "url": "https://github.com/denghongcai/node-lru-native.git"
+    "url": "https://github.com/denghongcai/node-lru-addon.git"
   },
   "devDependencies": {
     "chai": "latest",
