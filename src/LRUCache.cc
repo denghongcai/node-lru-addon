@@ -68,9 +68,9 @@ NAN_METHOD(LRUCache::New)
       cache->data.rehash(ceil(size->Uint32Value() / cache->data.max_load_factor()));
   }
 
-  cache->Wrap(info.Holder());
+  cache->Wrap(info.This());
 
-  info.GetReturnValue().Set(Nan::New(info.Holder()));
+  info.GetReturnValue().Set(info.This());
 }
 
 LRUCache::LRUCache()
@@ -131,7 +131,7 @@ void LRUCache::remove(const HashMap::const_iterator itr)
 
 NAN_METHOD(LRUCache::Get)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
   if (info.Length() != 1)
     return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for get(), expected 1"));
@@ -169,7 +169,7 @@ NAN_METHOD(LRUCache::Get)
 
 NAN_METHOD(LRUCache::Set)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
   unsigned long now = cache->maxAge == 0 ? 0 : getCurrentTime();
 
   if (info.Length() != 2)
@@ -213,7 +213,7 @@ NAN_METHOD(LRUCache::Set)
 
 NAN_METHOD(LRUCache::Remove)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
   if (info.Length() != 1)
     return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for remove(), expected 1"));
@@ -230,7 +230,7 @@ NAN_METHOD(LRUCache::Remove)
 
 NAN_METHOD(LRUCache::Clear)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
   cache->disposeAll();
   cache->data.clear();
@@ -242,13 +242,13 @@ NAN_METHOD(LRUCache::Clear)
 
 NAN_METHOD(LRUCache::Size)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
   info.GetReturnValue().Set(Nan::New<Integer>(static_cast<uint32_t>(cache->data.size())));
 }
 
 NAN_METHOD(LRUCache::Stats)
 {
-  LRUCache* cache = ObjectWrap::Unwrap<LRUCache>(info.Holder());
+  LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
 
   Local<Object> stats = Nan::New<Object>();
   Nan::Set(stats, Nan::New("size").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.size())));
@@ -256,5 +256,5 @@ NAN_METHOD(LRUCache::Stats)
   Nan::Set(stats, Nan::New("loadFactor").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.load_factor())));
   Nan::Set(stats, Nan::New("maxLoadFactor").ToLocalChecked(), Nan::New(static_cast<uint32_t>(cache->data.max_load_factor())));
 
-  info.GetReturnValue().Set(Nan::New(stats));
+  info.GetReturnValue().Set(stats);
 }

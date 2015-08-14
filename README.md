@@ -99,6 +99,7 @@ Returns a hash containing internal information about the cache.
 
 # Changelog
 
+- 1.0.3 -- Support io.js 3.0
 - 1.0.0 -- Publish a new package
 - 0.4.0 -- Use nan to across node version
 - 0.3.0 -- Changed memory allocation strategy, fixed issue where remove() would do a seek through the LRU list, code cleanup
