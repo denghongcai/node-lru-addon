@@ -1,7 +1,22 @@
+sudo: required
 language: node_js
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - build-essential
+    - gcc-5
+    - g++-5
+    
+before_install:
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+  - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-5 /usr/bin/g++
+
 node_js:
-        - "node"
-        - "0.12"
-        - "0.11"
-        - "0.10"
-        - "iojs"
+  - "node"
+  - "0.12"
+  - "0.11"
+  - "0.10"
+  - "iojs"

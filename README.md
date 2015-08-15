@@ -44,6 +44,10 @@ $ node-gyp configure
 $ node-gyp build
 ```
 
+# Benchmark
+
+See `benchmark` folder for a extremly simple test. You can do it by yourself aslo.
+
 # Configuration
 
 To configure the cache, you can pass a hash to the `LRUCache` constructor with the following options:
@@ -98,7 +102,7 @@ Returns the number of items in the cache.
 Returns a hash containing internal information about the cache.
 
 # Changelog
-
+- 1.0.4 -- Support Windows
 - 1.0.3 -- Support io.js 3.0
 - 1.0.0 -- Publish a new package
 - 0.4.0 -- Use nan to across node version
