@@ -1,6 +1,6 @@
 {
   "name": "lru-addon",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "a native LRU cache implementation",
   "gypfile": true,
   "repository": {
