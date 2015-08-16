@@ -10,5 +10,6 @@ for(i = 0; i < 1000; i+=2) {
     for(var j = 0; j < 1000; j++) {
         cache.get(i);
     } 
-} 
+}
 console.timeEnd('test');
+console.log(process.memoryUsage());
