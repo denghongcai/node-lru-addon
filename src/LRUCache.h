@@ -2,8 +2,6 @@
 #define LRUCACHE_H
 
 #include <time.h>
-#include <node.h>
-#include <node_object_wrap.h>
 #include <nan.h>
 #include <string>
 #include <list>
