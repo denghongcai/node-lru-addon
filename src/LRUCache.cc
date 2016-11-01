@@ -47,25 +47,24 @@ std::string getStringValue(Handle<Value> value)
   return std::string(*keyUtf8Value);
 }
 
-void LRUCache::init(Handle<Object> exports)
+NAN_MODULE_INIT(LRUCache::init)
 {
   Local<String> className = Nan::New("LRUCache").ToLocalChecked();
 
-  Local<FunctionTemplate> constructor = Nan::New<FunctionTemplate>(New);
-  constructor->SetClassName(className);
+  Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
+  tpl->SetClassName(className);
 
-  Handle<ObjectTemplate> instance = constructor->InstanceTemplate();
+  Handle<ObjectTemplate> instance = tpl->InstanceTemplate();
   instance->SetInternalFieldCount(6);
 
-  Handle<ObjectTemplate> prototype = constructor->PrototypeTemplate();
-  prototype->Set(Nan::New("get").ToLocalChecked(), Nan::New<FunctionTemplate>(Get)->GetFunction());
-  prototype->Set(Nan::New("set").ToLocalChecked(), Nan::New<FunctionTemplate>(Set)->GetFunction());
-  prototype->Set(Nan::New("remove").ToLocalChecked(), Nan::New<FunctionTemplate>(Remove)->GetFunction());
-  prototype->Set(Nan::New("clear").ToLocalChecked(), Nan::New<FunctionTemplate>(Clear)->GetFunction());
-  prototype->Set(Nan::New("size").ToLocalChecked(), Nan::New<FunctionTemplate>(Size)->GetFunction());
-  prototype->Set(Nan::New("stats").ToLocalChecked(), Nan::New<FunctionTemplate>(Stats)->GetFunction());
+  Nan::SetPrototypeMethod(tpl, "get", Get);
+  Nan::SetPrototypeMethod(tpl, "set", Set);
+  Nan::SetPrototypeMethod(tpl, "remove", Remove);
+  Nan::SetPrototypeMethod(tpl, "clear", Clear);
+  Nan::SetPrototypeMethod(tpl, "size", Size);
+  Nan::SetPrototypeMethod(tpl, "stats", Stats);
   
-  exports->Set(className, constructor->GetFunction());
+  Nan::Set(target, className, Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 NAN_METHOD(LRUCache::New)
