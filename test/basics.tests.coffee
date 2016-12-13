@@ -41,7 +41,7 @@ describe 'basics', ->
         cache.set 'foo3', 42
         cache.set 'bar4', 42
         assert.equal cache.get('foo1'), 42
-        assert.deepEqual (cache.removeSome 'foo'), ['foo3', 'foo2', 'foo1']
+        assert.deepEqual ((cache.removeSome 'foo').sort()), ['foo1', 'foo2', 'foo3']
         value = cache.get 'foo3'
         assert value is undefined, "expected result to be undefined, was #{value}"
 
