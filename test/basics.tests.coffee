@@ -33,6 +33,18 @@ describe 'basics', ->
         value = cache.get 'foo'
         assert value is undefined, "expected result to be undefined, was #{value}"
 
+    describe 'when removeSome() is called', ->
+
+      it 'should remove items that contain substring', ->
+        cache.set 'foo1', 42
+        cache.set 'foo2', 42
+        cache.set 'foo3', 42
+        cache.set 'bar4', 42
+        assert.equal cache.get('foo1'), 42
+        assert.deepEqual (cache.removeSome 'foo'), ['foo3', 'foo2', 'foo1']
+        value = cache.get 'foo3'
+        assert value is undefined, "expected result to be undefined, was #{value}"
+
     describe 'when size() is called', ->
 
       it 'should return the correct size', ->

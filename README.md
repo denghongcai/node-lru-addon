@@ -89,6 +89,10 @@ Returns the item with the specified key, or `undefined` if no item exists with t
 
 Removes the item with the specified key if it exists.
 
+## removeSome(subkey)
+
+Removes items that contain subkey in key and returns removed items.
+
 ## clear()
 
 Removes all items from the cache.
