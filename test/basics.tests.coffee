@@ -41,7 +41,7 @@ describe 'basics', ->
         cache.set 'foo3', 42
         cache.set 'bar4', 42
         assert.equal cache.get('foo1'), 42
-        assert.deepEqual ((cache.keys).sort), ['foo1', 'foo2', 'foo3', 'bar4']
+        assert.deepEqual ((cache.keys()).sort()), ['foo1', 'foo2', 'foo3', 'bar4'].sort()
       
       it 'should return keys that contain substring', ->
         cache.set 'foo1', 42
@@ -49,7 +49,7 @@ describe 'basics', ->
         cache.set 'foo3', 42
         cache.set 'bar4', 42
         assert.equal cache.get('foo1'), 42
-        assert.deepEqual ((cache.keys 'foo').sort), ['foo1', 'foo2', 'foo3']
+        assert.deepEqual ((cache.keys 'foo').sort()), ['foo1', 'foo2', 'foo3']
 
     describe 'when size() is called', ->
 
