@@ -206,7 +206,7 @@ NAN_METHOD(LRUCache::Keys)
 
   for(HashMap::const_iterator it = cache->data.begin(); it != cache->data.end(); ++it)
   {
-    if (keyFilter == "" || isInString(it->first, key)) {
+    if (keyFilter == "" || isInString(it->first, keyFilter)) {
       keys.push_back(it->first);
     }
   }
