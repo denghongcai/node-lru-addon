@@ -68,7 +68,7 @@ NAN_MODULE_INIT(LRUCache::init)
   Nan::SetPrototypeMethod(tpl, "clear", Clear);
   Nan::SetPrototypeMethod(tpl, "size", Size);
   Nan::SetPrototypeMethod(tpl, "stats", Stats);
-  Nan::SetPrototypeMethod(tpl, "removeSome", RemoveSome);
+  Nan::SetPrototypeMethod(tpl, "keys", Keys);
 
   Nan::Set(target, className, Nan::GetFunction(tpl).ToLocalChecked());
 }
@@ -197,34 +197,23 @@ NAN_METHOD(LRUCache::Get)
   }
 }
 
-NAN_METHOD(LRUCache::RemoveSome)
+NAN_METHOD(LRUCache::Keys)
 {
   LRUCache* cache = Nan::ObjectWrap::Unwrap<LRUCache>(info.Holder());
-  std::vector<std::string> result;
+  std::vector<std::string> keys;
 
-  if (info.Length() != 1)
-    return Nan::ThrowError(Nan::RangeError("Incorrect number of arguments for removeSome(), expected 1"));
-
-  std::string key = getStringValue(info[0]);
-
-  int count = 0;
+  std::string keyFilter = (info.Length() == 1) ? getStringValue(info[0]) : "";
 
   for(HashMap::const_iterator it = cache->data.begin(); it != cache->data.end(); ++it)
   {
-    if (isInString(it->first, key)) {
-      result.push_back(it->first);
-      count++;
+    if (keyFilter == "" || isInString(it->first, key)) {
+      keys.push_back(it->first);
     }
   }
 
-  v8::Local<v8::Array> arr = Nan::New<v8::Array>(count);
-  for(std::vector<int>::size_type i = 0; i != result.size(); i++) {
-    Nan::Set(arr, i, Nan::New<v8::String>(result[i]).ToLocalChecked());
-
-    const HashMap::iterator itr = cache->data.find(result[i]);
-
-    if (itr != cache->data.end())
-      cache->remove(itr);
+  v8::Local<v8::Array> arr = Nan::New<v8::Array>(keys.size());
+  for(std::vector<int>::size_type i = 0; i != keys.size(); i++) {
+    Nan::Set(arr, i, Nan::New<v8::String>(keys[i]).ToLocalChecked());
   }
 
   info.GetReturnValue().Set(arr);
