@@ -55,6 +55,7 @@ private:
 
   static NAN_METHOD(New);
   static NAN_METHOD(Get);
+  static NAN_METHOD(Keys);
   static NAN_METHOD(Set);
   static NAN_METHOD(Remove);
   static NAN_METHOD(Clear);

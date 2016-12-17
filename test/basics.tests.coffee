@@ -33,6 +33,24 @@ describe 'basics', ->
         value = cache.get 'foo'
         assert value is undefined, "expected result to be undefined, was #{value}"
 
+    describe 'when keys() is called', ->
+
+      it 'should return all keys', ->
+        cache.set 'foo1', 42
+        cache.set 'foo2', 42
+        cache.set 'foo3', 42
+        cache.set 'bar4', 42
+        assert.equal cache.get('foo1'), 42
+        assert.deepEqual ((cache.keys()).sort()), ['foo1', 'foo2', 'foo3', 'bar4'].sort()
+      
+      it 'should return keys that contain substring', ->
+        cache.set 'foo1', 42
+        cache.set 'foo2', 42
+        cache.set 'foo3', 42
+        cache.set 'bar4', 42
+        assert.equal cache.get('foo1'), 42
+        assert.deepEqual ((cache.keys 'foo').sort()), ['foo1', 'foo2', 'foo3']
+
     describe 'when size() is called', ->
 
       it 'should return the correct size', ->
